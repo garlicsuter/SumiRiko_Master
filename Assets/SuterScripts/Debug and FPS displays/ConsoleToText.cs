@@ -2,10 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class ConsoleToText : MonoBehaviour
 {
-    public Text debugText;
+    public TextMeshProUGUI debugText;
     string output = "";
     string stack = "";
 

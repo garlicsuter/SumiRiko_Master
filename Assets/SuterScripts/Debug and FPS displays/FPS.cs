@@ -2,10 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class FPS : MonoBehaviour
 {
-    Text fpsText;
+    public TMP_Text fpsText;
     public int refreshRate = 10;
     int frameCounter;
     float totalTime;
@@ -13,7 +14,7 @@ public class FPS : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        fpsText = GetComponent<Text>();
+        fpsText = GetComponent<TMP_Text>();
         frameCounter = 0;
         totalTime = 0;
     }

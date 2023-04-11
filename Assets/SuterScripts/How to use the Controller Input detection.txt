@@ -1,0 +1,3 @@
+To use: Create an empty gameobject (like "GameManager") and add the scripts "TriggerInputDetector" and "inputdata" onto it.
+
+Assign the Canvas texts to see the values in game view, not just debug log.
