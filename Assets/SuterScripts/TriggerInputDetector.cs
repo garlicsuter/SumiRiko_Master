@@ -7,6 +7,7 @@ public class TriggerInputDetector : MonoBehaviour
 {
     public TextMeshProUGUI leftScoreDisplay;
     public TextMeshProUGUI rightScoreDisplay;
+    public TextMeshProUGUI LeftThumbstickDisplay;
 
     private InputData _inputData;
     private float _leftMaxScore = 0f;
@@ -50,7 +51,15 @@ public class TriggerInputDetector : MonoBehaviour
 
         if (_inputData._rightController.TryGetFeatureValue(CommonUsages.secondaryButton, out bool Bbutton))
         {
-            Debug.Log("B button: " + Bbutton);
+            //Debug.Log("B button: " + Bbutton);
+        }
+
+        //Check the 2D Axis value of the left controller thumbstick
+        if (_inputData._leftController.TryGetFeatureValue(CommonUsages.primary2DAxis, out Vector2 thumbstickValue))
+        {
+
+            LeftThumbstickDisplay.text = thumbstickValue.ToString();
+            //Debug.Log("triggerValue: " + triggerValue);
         }
 
         //If the UI is active (from button press above) set position to the canvas anchor
