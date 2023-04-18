@@ -45,8 +45,10 @@ public class Socket : MonoBehaviour
     {
         if(child.gameObject != null)
         {
+            Debug.Log("child.gameObject is NOT null!");
             if(!IsGrabbed(child.gameObject))
             {
+                Debug.Log("Child is NOT grabbed anymore");
                 // Lerp child to the center of the socket
                 float distance = Vector3.Distance(child.gameObject.transform.position, transform.position);
                 if(distance <= 0.001f)
@@ -78,7 +80,7 @@ public class Socket : MonoBehaviour
         if(child.gameObject == null)
         {
             var obj = other.gameObject;
-
+            Debug.Log("the obj = " + obj);
             // Modify color of the socket based off
             // of the transform of the held object
             if(IsValid(obj))
