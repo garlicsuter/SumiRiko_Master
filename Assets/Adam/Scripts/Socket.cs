@@ -7,9 +7,9 @@ using UnityEngine.XR.Interaction.Toolkit;
 /// </summary>
 public class Socket : MonoBehaviour
 {
-    // References
     private XRRayInteractor rightController, leftController;
     private SocketChild child = new SocketChild();
+    private MeshFilter meshFilter;
     private MeshRenderer meshRenderer;
 
     public Color OverlayColor
@@ -28,13 +28,12 @@ public class Socket : MonoBehaviour
 
     private void Start()
     {
-        // Controllers
         rightController = GameObject.Find("LeftHand Controller").GetComponent<XRRayInteractor>();
         leftController = GameObject.Find("RightHand Controller").GetComponent<XRRayInteractor>();
 
+        meshFilter = gameObject.GetComponent<MeshFilter>();
         meshRenderer = gameObject.GetComponent<MeshRenderer>();
 
-        // Trigger
         var collider = gameObject.AddComponent<SphereCollider>();
         collider.hideFlags = HideFlags.HideInInspector;
         collider.isTrigger = true;
@@ -47,16 +46,13 @@ public class Socket : MonoBehaviour
         {
             if(!IsGrabbed(child.gameObject))
             {
-                // Lerp child to the center of the socket
+                // Lerp child position to the center of the socket
                 float distance = Vector3.Distance(child.gameObject.transform.position, transform.position);
-                if(distance <= 0.001f)
-                {
-                    child.gameObject.transform.position = transform.position;
-                }
-                else
-                {
-                    child.gameObject.transform.position = Vector3.Lerp(child.gameObject.transform.position, transform.position, lerpSpeed * Time.deltaTime);
-                }
+                child.gameObject.transform.position = distance <= 0.001f ? transform.position : Vector3.Lerp(child.gameObject.transform.position, transform.position, lerpSpeed * Time.deltaTime);
+                
+                // Lerp child rotation to the forward direction of the socket
+                float angle = Quaternion.Angle(child.gameObject.transform.rotation, transform.rotation);
+                child.gameObject.transform.rotation = angle <= 5 ? transform.rotation : Quaternion.Lerp(child.gameObject.transform.rotation, transform.rotation, lerpSpeed * Time.deltaTime);
             }
             else
             {
@@ -69,6 +65,9 @@ public class Socket : MonoBehaviour
             if(transform.childCount > 0)
             {
                 transform.DetachChildren();
+
+                meshFilter.mesh = null;
+                meshRenderer.material.color = Color.clear;
             }
         }
     }
@@ -79,9 +78,12 @@ public class Socket : MonoBehaviour
         {
             var obj = other.gameObject;
 
-            // Modify color of the socket based off
-            // of the transform of the held object
-            if(IsValid(obj))
+            // Provide a visual aid of how the object should be positioned
+            meshFilter.mesh = obj.GetComponent<MeshFilter>().sharedMesh;
+            transform.localScale = obj.transform.localScale;
+
+            // Modify color of the socket based off of the transform of the held object
+            if (IsValid(obj))
             {
                 OverlayColor = Color.green;
 
@@ -90,13 +92,10 @@ public class Socket : MonoBehaviour
                 {
                     child.gameObject = obj;
                     child.body = obj.GetComponent<Rigidbody>();
-
                     child.gameObject.transform.SetParent(transform);
                     child.body.isKinematic = true;
 
-                    // Preserve horizontal rotation
-                    child.gameObject.transform.rotation = Quaternion.Euler(0, child.gameObject.transform.rotation.eulerAngles.y, 0);
-
+                    // Make mesh transparent
                     OverlayColor = Color.clear;
                 }
             }
