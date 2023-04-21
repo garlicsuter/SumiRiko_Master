@@ -12,7 +12,7 @@ public class Socket : MonoBehaviour
     private GenericObject child = new GenericObject();
     private GenericObject clone = new GenericObject();
 
-    private GameObject candidate;
+    private GameObject heldObject;
 
     public Material material;
 
@@ -37,9 +37,9 @@ public class Socket : MonoBehaviour
 
     private void Update()
     {
-        if(child.gameObject != null)
+        if (child.gameObject != null)
         {
-            if(!IsGrabbed(child.gameObject))
+            if (!IsGrabbed(child.gameObject))
             {
                 // Lerp child position to the center of the socket
                 float distance = Vector3.Distance(child.transform.position, transform.position);
@@ -47,7 +47,7 @@ public class Socket : MonoBehaviour
 
                 // Lerp child rotation to the forward direction of the socket
                 float angle = Quaternion.Angle(child.transform.rotation, transform.rotation);
-                child.transform.rotation = angle <= 5 ? transform.rotation : Quaternion.Lerp(child.transform.rotation, transform.rotation, lerpSpeed * Time.deltaTime);
+                child.transform.rotation = angle <= 1 ? transform.rotation : Quaternion.Lerp(child.transform.rotation, transform.rotation, lerpSpeed * Time.deltaTime);
             }
             else
             {
@@ -58,41 +58,37 @@ public class Socket : MonoBehaviour
 
     private void OnTriggerStay(Collider other)
     {
-        if(child.gameObject == null)
+        if (child.gameObject == null)
         {
-            candidate = other.gameObject;
+            heldObject = other.gameObject;
 
-            // Create a projection of the held object as a visual aid
-            if(clone.gameObject == null)
+            // Create a clone of the held object as a visual aid
+            if (clone.gameObject == null)
             {
-                print("COPIED");
-
                 // Fetch values
                 clone.gameObject = new GameObject("Clone");
                 clone.filter = clone.gameObject.AddComponent<MeshFilter>();
                 clone.renderer = clone.gameObject.AddComponent<MeshRenderer>();
 
                 // Copy values
-                clone.filter.mesh = candidate.GetComponent<MeshFilter>().sharedMesh;
+                clone.filter.mesh = heldObject.GetComponent<MeshFilter>().sharedMesh;
                 clone.renderer.material = material;
                 clone.transform.SetParent(transform);
                 clone.transform.position = transform.position;
                 clone.transform.rotation = transform.rotation;
-                clone.transform.localScale = candidate.transform.localScale;
+                clone.transform.localScale = heldObject.transform.localScale;
             }
 
             // Check for a valid orientation
-            if(IsValid(candidate))
+            if (IsValid(heldObject))
             {
                 clone.color = Color.green;
 
                 // Release the object to confirm selection
-                if(!IsGrabbed(candidate))
+                if (!IsGrabbed(heldObject))
                 {
-                    print("ASSIGNED");
-
-                    child.gameObject = candidate;
-                    child.body = candidate.GetComponent<Rigidbody>();
+                    child.gameObject = heldObject;
+                    child.body = heldObject.GetComponent<Rigidbody>();
 
                     child.transform.SetParent(transform);
                     child.body.isKinematic = true;
@@ -114,28 +110,33 @@ public class Socket : MonoBehaviour
         float distance = Vector3.Distance(point, transform.position);
 
         // Remove visual
-        if(collider.gameObject == candidate && distance >= radius)
+        if (collider.gameObject == heldObject && distance >= radius)
         {
-            candidate = null;
+            heldObject = null;
             clone.Destroy();
+        }
+
+        if (collider.gameObject == child.gameObject && distance >= radius)
+        {
+            RemoveChild();
         }
     }
 
     /// <summary>
     /// Does the user have this object in their hand?
     /// </summary>
-    private bool IsGrabbed(GameObject obj)
+    public bool IsGrabbed(GameObject obj)
     {
-        if(rightController.hasSelection)
+        if (rightController.hasSelection)
         {
-            if(rightController.interactablesSelected[0].transform.gameObject == obj)
+            if (rightController.interactablesSelected[0].transform.gameObject == obj)
             {
                 return true;
             }
         }
-        if(leftController.hasSelection)
+        if (leftController.hasSelection)
         {
-            if(leftController.interactablesSelected[0].transform.gameObject == obj)
+            if (leftController.interactablesSelected[0].transform.gameObject == obj)
             {
                 return true;
             }
@@ -153,12 +154,18 @@ public class Socket : MonoBehaviour
         return angle <= tolerance;
     }
 
+    /// <summary>
+    /// Remove and dereference the child
+    /// </summary>
     private void RemoveChild()
     {
-        print("REMOVE");
-
-        child.gameObject.transform.parent = null;
-        child.body.isKinematic = false;
+        // Wait until the user has dropped the child before resetting it
+        if (child.gameObject.GetComponent<SocketChildReset>() == null)
+        {
+            var comp = child.gameObject.AddComponent<SocketChildReset>();
+            var func = comp.Wait(this, child.gameObject);
+            StartCoroutine(func);
+        }
 
         child.gameObject = null;
         child.body = null;
@@ -196,15 +203,14 @@ internal struct GenericObject
     public MeshFilter filter;
     public MeshRenderer renderer;
 
-    public Transform transform
-    {
-        get => gameObject.transform;
-    }
-
     public Color color
     {
         get => renderer.material.color;
         set => renderer.material.color = value;
+    }
+    public Transform transform
+    {
+        get => gameObject.transform;
     }
 
     public void Destroy()
