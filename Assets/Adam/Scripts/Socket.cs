@@ -8,14 +8,13 @@ using UnityEngine.XR.Interaction.Toolkit;
 public class Socket : MonoBehaviour
 {
     private XRRayInteractor rightController, leftController;
-    private SocketChild child = new SocketChild();
 
-    private Rigidbody prevChild;
+    private GenericObject child = new GenericObject();
+    private GenericObject clone = new GenericObject();
 
-    private GameObject clone;
-    private MeshRenderer cloneRenderer;
+    private GameObject candidate;
 
-    public Material cloneMaterial;
+    public Material material;
 
     // TODO: Make it ratio between 0 to 1 where radius impacts speed?
     public float lerpSpeed = 5.0f;
@@ -38,22 +37,17 @@ public class Socket : MonoBehaviour
 
     private void Update()
     {
-        if (prevChild.isKinematic)
+        if(child.gameObject != null)
         {
-            prevChild.isKinematic = false;
-        }
-
-        if (child.gameObject != null)
-        {
-            if (!IsGrabbed(child.gameObject))
+            if(!IsGrabbed(child.gameObject))
             {
                 // Lerp child position to the center of the socket
-                float distance = Vector3.Distance(child.gameObject.transform.position, transform.position);
-                child.gameObject.transform.position = distance <= 0.001f ? transform.position : Vector3.Lerp(child.gameObject.transform.position, transform.position, lerpSpeed * Time.deltaTime);
+                float distance = Vector3.Distance(child.transform.position, transform.position);
+                child.transform.position = distance <= 0.001f ? transform.position : Vector3.Lerp(child.transform.position, transform.position, lerpSpeed * Time.deltaTime);
 
                 // Lerp child rotation to the forward direction of the socket
-                float angle = Quaternion.Angle(child.gameObject.transform.rotation, transform.rotation);
-                child.gameObject.transform.rotation = angle <= 5 ? transform.rotation : Quaternion.Lerp(child.gameObject.transform.rotation, transform.rotation, lerpSpeed * Time.deltaTime);
+                float angle = Quaternion.Angle(child.transform.rotation, transform.rotation);
+                child.transform.rotation = angle <= 5 ? transform.rotation : Quaternion.Lerp(child.transform.rotation, transform.rotation, lerpSpeed * Time.deltaTime);
             }
             else
             {
@@ -64,69 +58,66 @@ public class Socket : MonoBehaviour
 
     private void OnTriggerStay(Collider other)
     {
-        if (child.gameObject == null)
+        if(child.gameObject == null)
         {
-            var obj = other.gameObject;
+            candidate = other.gameObject;
 
-            // Provide a visual aid of how the object should be positioned
-            if (clone == null)
+            // Create a projection of the held object as a visual aid
+            if(clone.gameObject == null)
             {
-                clone = new GameObject("Reference");
+                print("COPIED");
 
-                var refMesh = obj.GetComponent<MeshFilter>();
+                // Fetch values
+                clone.gameObject = new GameObject("Clone");
+                clone.filter = clone.gameObject.AddComponent<MeshFilter>();
+                clone.renderer = clone.gameObject.AddComponent<MeshRenderer>();
 
-                cloneRenderer = clone.AddComponent<MeshRenderer>();
-                var cloneFilter = clone.AddComponent<MeshFilter>();
-
-
-                cloneRenderer.material = cloneMaterial;
-                cloneFilter.mesh = refMesh.sharedMesh;
-
+                // Copy values
+                clone.filter.mesh = candidate.GetComponent<MeshFilter>().sharedMesh;
+                clone.renderer.material = material;
                 clone.transform.SetParent(transform);
-
                 clone.transform.position = transform.position;
                 clone.transform.rotation = transform.rotation;
-                clone.transform.localScale = obj.transform.localScale;
+                clone.transform.localScale = candidate.transform.localScale;
             }
 
-            // Modify color of the socket based off of the transform of the held object
-            if (IsValid(obj))
+            // Check for a valid orientation
+            if(IsValid(candidate))
             {
-                cloneRenderer.material.color = Color.green;
+                clone.color = Color.green;
 
-                // Releasing the object will confirm the selection
-                if (!IsGrabbed(obj))
+                // Release the object to confirm selection
+                if(!IsGrabbed(candidate))
                 {
                     print("ASSIGNED");
 
-                    child.gameObject = obj;
-                    child.body = obj.GetComponent<Rigidbody>();
-                    child.gameObject.transform.SetParent(transform);
+                    child.gameObject = candidate;
+                    child.body = candidate.GetComponent<Rigidbody>();
+
+                    child.transform.SetParent(transform);
                     child.body.isKinematic = true;
 
-                    // Make mesh transparent
-                    cloneRenderer.material.color = Color.clear;
+                    // Remove visual on confirmation
+                    clone.Destroy();
                 }
             }
             else
             {
-                cloneRenderer.material.color = Color.red;
+                clone.color = Color.red;
             }
         }
     }
 
-    // NOTE: I have no idea if this even does anything
     private void OnTriggerExit(Collider collider)
     {
         Vector3 point = collider.ClosestPoint(transform.position);
         float distance = Vector3.Distance(point, transform.position);
 
-        if (distance >= radius)
+        // Remove visual
+        if(collider.gameObject == candidate && distance >= radius)
         {
-            if (collider.gameObject == child.gameObject)
-            {
-                RemoveChild();
-            }
+            candidate = null;
+            clone.Destroy();
         }
     }
 
@@ -169,12 +160,8 @@ public class Socket : MonoBehaviour
         child.gameObject.transform.parent = null;
         child.body.isKinematic = false;
 
-        prevChild = child.body;
-
         child.gameObject = null;
         child.body = null;
-
-        Destroy(clone);
     }
 
     private void OnDrawGizmos()
@@ -202,8 +189,31 @@ public class Socket : MonoBehaviour
 }
 
 [Serializable]
-internal class SocketChild
+internal struct GenericObject
 {
-    public GameObject gameObject = null;
-    public Rigidbody body = null;
+    public GameObject gameObject;
+    public Rigidbody body;
+    public MeshFilter filter;
+    public MeshRenderer renderer;
+
+    public Transform transform
+    {
+        get => gameObject.transform;
+    }
+
+    public Color color
+    {
+        get => renderer.material.color;
+        set => renderer.material.color = value;
+    }
+
+    public void Destroy()
+    {
+        UnityEngine.Object.Destroy(gameObject);
+
+        gameObject = null;
+        body = null;
+        filter = null;
+        renderer = null;
+    }
 }

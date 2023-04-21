@@ -1533,7 +1533,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c04488de223a97744abdd5cc4d3195c6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cloneMaterial: {fileID: 2100000, guid: f3f01728fd58ff34d82e4981ea93b0b3, type: 2}
+  material: {fileID: 2100000, guid: f3f01728fd58ff34d82e4981ea93b0b3, type: 2}
   lerpSpeed: 5
   radius: 0.5
   tolerance: 45
@@ -2394,9 +2394,9 @@ GameObject:
   - component: {fileID: 1644133951}
   - component: {fileID: 1644133950}
   - component: {fileID: 1644133949}
-  - component: {fileID: 1644133948}
   - component: {fileID: 1644133947}
   - component: {fileID: 1644133952}
+  - component: {fileID: 1644133953}
   m_Layer: 0
   m_Name: Grabable Object
   m_TagString: Untagged
@@ -2420,19 +2420,6 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!65 &1644133948
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1644133944}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &1644133949
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -2482,7 +2469,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1644133944}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  m_Mesh: {fileID: -6667443264580622780, guid: fc6bc0cae249f30408bd6dd54fc01b6a, type: 3}
 --- !u!4 &1644133951
 Transform:
   m_ObjectHideFlags: 0
@@ -2492,7 +2479,7 @@ Transform:
   m_GameObject: {fileID: 1644133944}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.75, y: 1, z: -0.25}
-  m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -2633,6 +2620,19 @@ MonoBehaviour:
   m_StartingSingleGrabTransformers: []
   m_StartingMultipleGrabTransformers: []
   m_AddDefaultGrabTransformers: 1
+--- !u!65 &1644133953
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1644133944}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.19042867, y: 0.1577044, z: 0.27535683}
+  m_Center: {x: 0.023645375, y: 0.078852184, z: -0.000019155443}
 --- !u!1 &1661278777
 GameObject:
   m_ObjectHideFlags: 0
