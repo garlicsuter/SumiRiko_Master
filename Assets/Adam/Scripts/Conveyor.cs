@@ -1,12 +1,15 @@
 using System;
+using TMPro;
 using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 public class Conveyor : MonoBehaviour
 {
     private Node[] nodes;
     private float length;
 
-    public float spacing;
+    public int amount;
 
     private void OnValidate()
     {
@@ -38,19 +41,42 @@ public class Conveyor : MonoBehaviour
             Gizmos.DrawWireSphere(nodes[i].position, 0.1f);
 
             // Does this node continue?
-            if(i + 1 < nodes.Length)
+            if(nodes[i].isEnd == false)
             {
                 Gizmos.color = Color.cyan;
                 Gizmos.DrawLine(nodes[i].position, nodes[i + 1].position);
-
-                Vector3 dir = (nodes[i + 1].position - nodes[i].position).normalized;
-                float total = (nodes[i].length / spacing);
-                for(int f = 1; f < (int)(total); f++)
-                {
-                    Gizmos.color = Color.green;
-                    Gizmos.DrawWireSphere(nodes[i].position + (dir * (nodes.Length / f)), 0.025f);
-                }
             }
+        }
+
+        Gizmos.color = Color.green;
+
+        int index = 0;
+
+        float accumulation = 0.0f;
+        float increment = length / (amount + 1);
+
+        for(int count = 1; count <= amount; count++)
+        {
+            float offset = increment * count - accumulation;
+
+            if(nodes[index].length < offset)
+            {
+                accumulation += nodes[index].length + (offset - nodes[index].length);
+                index += 1;
+            }
+
+            if(nodes[index].isEnd == false)
+            {
+                Vector3 dir = (nodes[index + 1].position - nodes[index].position).normalized;
+                Gizmos.DrawWireSphere(nodes[index].position + (dir * offset), 0.05f);
+            }
+            else
+            {
+                print($"[FINISHED] - [Index: {index}] [Count: {count}]");
+                break;
+            };
+
+            print($"[Index: {index}] [Count: {count}] [Offset: {offset}]");
         }
     }
 }
@@ -60,5 +86,5 @@ internal struct Node
 {
     internal Vector3 position;
     internal float length;
-    internal bool end => length == 0;
+    internal bool isEnd => length == 0;
 }
