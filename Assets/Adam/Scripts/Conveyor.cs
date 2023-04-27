@@ -1,11 +1,12 @@
 using System;
-using TMPro;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEditor;
 using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.Rendering.Universal;
 
 public class Conveyor : MonoBehaviour
 {
+    private Vector3[] points;
     private Node[] nodes;
     private float length;
 
@@ -32,6 +33,8 @@ public class Conveyor : MonoBehaviour
             nodes[i].length = dist;
             length += dist;
         }
+
+        points = GeneratePoints().ToArray();
     }
     private void OnDrawGizmos()
     {
@@ -48,35 +51,44 @@ public class Conveyor : MonoBehaviour
             }
         }
 
-        Gizmos.color = Color.green;
+        for(int i = 0; i < points.Length; i++)
+        {
+            Handles.DrawWireCube(points[i], Vector3.one * 0.05f);
+            Handles.Label(points[i], (i + 1).ToString());
+        }
+    }
 
+    private IEnumerable<Vector3> GeneratePoints()
+    {
         int index = 0;
+        float offset = 0.0f;
 
-        float accumulation = 0.0f;
-        float increment = length / (amount + 1);
+        float increment = length / amount;
 
+        // Generate evenly spaced points (this was an absolute pain)
         for(int count = 1; count <= amount; count++)
         {
-            float offset = increment * count - accumulation;
-
-            if(nodes[index].length < offset)
+            // No space remains so switch to the next path
+            if(offset > nodes[index].length)
             {
-                accumulation += nodes[index].length + (offset - nodes[index].length);
+                offset -= nodes[index].length;
                 index += 1;
+
+                // Completed point generation
+                if(nodes[index].isEnd)
+                {
+                    break;
+                }
             }
 
-            if(nodes[index].isEnd == false)
-            {
-                Vector3 dir = (nodes[index + 1].position - nodes[index].position).normalized;
-                Gizmos.DrawWireSphere(nodes[index].position + (dir * offset), 0.05f);
-            }
-            else
-            {
-                print($"[FINISHED] - [Index: {index}] [Count: {count}]");
-                break;
-            };
+            // Calculate location
+            Vector3 direction = (nodes[index + 1].position - nodes[index].position).normalized;
+            Vector3 position = nodes[index].position + (offset * direction);
 
-            print($"[Index: {index}] [Count: {count}] [Offset: {offset}]");
+            // ...
+            offset += increment;
+
+            yield return position;
         }
     }
 }
@@ -86,5 +98,8 @@ internal struct Node
 {
     internal Vector3 position;
     internal float length;
-    internal bool isEnd => length == 0;
+    internal bool isEnd
+    {
+        get => length <= 0;
+    }
 }
