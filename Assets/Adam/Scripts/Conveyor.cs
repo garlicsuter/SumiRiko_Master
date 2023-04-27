@@ -6,8 +6,7 @@ using System.Linq;
 
 public class Conveyor : MonoBehaviour
 {
-    private GameObject[] clones;
-    private _Transform[] points;
+    private Point[] points;
     private Node[] nodes;
     private float length;
 
@@ -19,19 +18,29 @@ public class Conveyor : MonoBehaviour
         InitNodes();
 
         points = GeneratePoints().ToArray();
-
-        for ( int i = 0; i < points.Length; i++)
-        {
-            clones[i] = Instantiate(clone, transform);
-            clones[i].transform.position = points[i].position;
-            clones[i].transform.rotation = points[i].rotation;
-        }
     }
     private void Update()
     {
         for( int i = 0; i < points.Length; i++)
         {
-            clones[i].transform.position += points[i].forward * Time.deltaTime;
+            var point = points[i];
+
+            var time = Time.deltaTime;
+
+            points[i].transform.position += point.transform.forward * time;
+            points[i].offset += time;
+
+            if (point.offset > nodes[point.node].length)
+            {
+                points[i].node = !nodes[point.node].isEnd ? point.node + 1 : 0;
+                points[i].offset = 0.0f;
+
+                point = points[i];
+
+                points[i].transform.position = nodes[point.node].position;
+                points[i].transform.forward = nodes[point.node].forward;
+                points[i].transform.rotation = Quaternion.LookRotation(nodes[point.node].forward);
+            }
         }
     }
     private void OnValidate()
@@ -96,7 +105,7 @@ public class Conveyor : MonoBehaviour
             length += distance;
         }
     }
-    private IEnumerable<_Transform> GeneratePoints()
+    private IEnumerable<Point> GeneratePoints()
     {
         int index = 0;
         float offset = 0.0f;
@@ -126,12 +135,34 @@ public class Conveyor : MonoBehaviour
 
             // ...
             Vector3 position = node.position + (offset * node.forward.normalized);
+            Vector3 forward = node.forward;
             Quaternion rotation = Quaternion.LookRotation(node.forward);
+
+            // ...
+            var point = new Point();
+            if (Application.isPlaying)
+            {
+                point.gameObject = Instantiate(clone, transform);
+                point.transform.position = position;
+                point.transform.forward = forward;
+                point.transform.rotation = rotation;
+            }
+            // Editor
+            else
+            {
+                point.position = position;
+                point.forward = forward;
+                point.rotation = rotation;
+            }
+
+            // ...
+            point.offset = offset;
+            point.node = index;
 
             // ...
             offset += increment;
 
-            yield return new _Transform(position, node.forward, rotation);
+            yield return point;
         }
     }
 }
@@ -150,16 +181,16 @@ internal struct Node
 }
 
 [Serializable]
-internal struct _Transform
+internal struct Point
 {
+    internal GameObject gameObject;
+    internal Transform transform => gameObject.transform;
+
+    internal float offset;
+    internal int node;
+
+    // Editor
     internal Vector3 position;
     internal Vector3 forward;
     internal Quaternion rotation;
-
-    internal _Transform(Vector3 pos, Vector3 fwd, Quaternion rot)
-    {
-        position = pos;
-        forward = fwd;
-        rotation = rot;
-    }
 }
