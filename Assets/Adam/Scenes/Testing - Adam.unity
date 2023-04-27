@@ -971,6 +971,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   amount: 10
+  clone: {fileID: 0}
 --- !u!1 &314680594
 GameObject:
   m_ObjectHideFlags: 0
@@ -1083,6 +1084,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   amount: 0
+  clone: {fileID: 0}
 --- !u!1 &420673470
 GameObject:
   m_ObjectHideFlags: 0
@@ -1994,6 +1996,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   amount: 10
+  clone: {fileID: 0}
 --- !u!4 &1060515665
 Transform:
   m_ObjectHideFlags: 0
@@ -3502,7 +3505,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98e5b38358577b74b909144fc112c4f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  amount: 15
+  amount: 8
+  clone: {fileID: 4563262600362309666, guid: 7f5ffd041e07caf4fa27ccc00a4e7984, type: 3}
 --- !u!4 &1947945846
 Transform:
   m_ObjectHideFlags: 0

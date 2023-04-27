@@ -35,8 +35,8 @@ public class Socket : MonoBehaviour
 
     private void Start()
     {
-        rightController = GameObject.Find("LeftHand Controller").GetComponent<XRRayInteractor>();
-        leftController = GameObject.Find("RightHand Controller").GetComponent<XRRayInteractor>();
+        rightController = GameObject.Find("LeftHand Controller")?.GetComponent<XRRayInteractor>();
+        leftController = GameObject.Find("RightHand Controller")?.GetComponent<XRRayInteractor>();
 
         radius = size * 0.5f;
         speed = speedRatio > 0 ? speedRatio * 10 : 0.1f;

@@ -6,15 +6,58 @@ using UnityEngine;
 
 public class Conveyor : MonoBehaviour
 {
-    private Vector3[] points;
+    private _Transform[] points;
     private Node[] nodes;
     private float length;
 
     public int amount;
+    public GameObject clone;
 
+    private void Start()
+    {
+        InitNodes();
+
+        foreach(var point in points)
+        {
+            var obj = Instantiate(clone, transform);
+            obj.transform.position = point.position;
+            obj.transform.rotation = point.rotation;
+        }
+    }
+    private void Update()
+    {
+
+    }
     private void OnValidate()
     {
-        // Reset value
+        if(Application.isPlaying == false)
+            InitNodes();
+    }
+    private void OnDrawGizmos()
+    {
+        for(int i = 0; i < nodes.Length; i++)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(nodes[i].position, 0.1f);
+
+            // Does this node continue?
+            if(nodes[i].isEnd == false)
+            {
+                Gizmos.color = Color.cyan;
+                Gizmos.DrawLine(nodes[i].position, nodes[i + 1].position);
+            }
+        }
+
+        for(int i = 0; i < points.Length; i++)
+        {
+            Handles.DrawWireCube(points[i].position, Vector3.one * 0.05f);
+            Handles.Label(points[i].position, (i + 1).ToString());
+        }
+    }
+
+    private void InitNodes()
+    {
+        // Reinitialize value just in case
         length = 0.0f;
 
         // Init nodes
@@ -36,29 +79,7 @@ public class Conveyor : MonoBehaviour
 
         points = GeneratePoints().ToArray();
     }
-    private void OnDrawGizmos()
-    {
-        for(int i = 0; i < nodes.Length; i++)
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(nodes[i].position, 0.1f);
-
-            // Does this node continue?
-            if(nodes[i].isEnd == false)
-            {
-                Gizmos.color = Color.cyan;
-                Gizmos.DrawLine(nodes[i].position, nodes[i + 1].position);
-            }
-        }
-
-        for(int i = 0; i < points.Length; i++)
-        {
-            Handles.DrawWireCube(points[i], Vector3.one * 0.05f);
-            Handles.Label(points[i], (i + 1).ToString());
-        }
-    }
-
-    private IEnumerable<Vector3> GeneratePoints()
+    private IEnumerable<_Transform> GeneratePoints()
     {
         int index = 0;
         float offset = 0.0f;
@@ -82,13 +103,13 @@ public class Conveyor : MonoBehaviour
             }
 
             // Calculate location
-            Vector3 direction = (nodes[index + 1].position - nodes[index].position).normalized;
-            Vector3 position = nodes[index].position + (offset * direction);
+            Vector3 direction = nodes[index + 1].position - nodes[index].position;
+            Vector3 position = nodes[index].position + (offset * direction.normalized);
 
             // ...
             offset += increment;
 
-            yield return position;
+            yield return new _Transform(position, Quaternion.LookRotation(direction));
         }
     }
 }
@@ -101,5 +122,18 @@ internal struct Node
     internal bool isEnd
     {
         get => length <= 0;
+    }
+}
+
+[Serializable]
+internal struct _Transform
+{
+    internal Vector3 position;
+    internal Quaternion rotation;
+
+    internal _Transform(Vector3 pos, Quaternion rot)
+    {
+        position = pos;
+        rotation = rot;
     }
 }
