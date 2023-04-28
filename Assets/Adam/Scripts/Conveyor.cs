@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
-using UnityEditor;
-using UnityEngine;
 using System.Linq;
+using UnityEngine;
 
 public class Conveyor : MonoBehaviour
 {
     private Point[] points;
-    private Node[] nodes;
+    public Node[] nodes;
     private float length;
 
     public int amount;
@@ -16,12 +15,10 @@ public class Conveyor : MonoBehaviour
     private void Start()
     {
         InitNodes();
-
-        points = GeneratePoints().ToArray();
     }
     private void Update()
     {
-        for( int i = 0; i < points.Length; i++)
+        for(int i = 0; i < points.Length; i++)
         {
             var point = points[i];
 
@@ -30,7 +27,7 @@ public class Conveyor : MonoBehaviour
             points[i].transform.position += point.transform.forward * time;
             points[i].offset += time;
 
-            if (point.offset > nodes[point.node].length)
+            if(point.offset > nodes[point.node].length)
             {
                 points[i].node = !nodes[point.node].isEnd ? point.node + 1 : 0;
                 points[i].offset = 0.0f;
@@ -43,67 +40,61 @@ public class Conveyor : MonoBehaviour
             }
         }
     }
-    private void OnValidate()
-    {
-        if (Application.isPlaying == false)
-        {
-            InitNodes();
-            points = GeneratePoints().ToArray();
-        }
-    }
     private void OnDrawGizmos()
     {
-        for (int i = 0; i < nodes.Length; i++)
+        for(int i = 0; i < nodes.Length; i++)
         {
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(nodes[i].position, 0.1f);
 
             // Does this node continue?
-            if (nodes[i].isEnd == false)
+            if(nodes[i].isEnd == false)
             {
                 Gizmos.color = Color.cyan;
                 Gizmos.DrawLine(nodes[i].position, nodes[i + 1].position);
             }
         }
 
-        int count = 1;
-        foreach (var point in points)
-        {
-            Handles.DrawWireCube(point.position, Vector3.one * 0.05f);
-            Handles.Label(point.position, (count++).ToString());
-        }
+        //int count = 1;
+        //foreach(var point in points)
+        //{
+        //    Handles.DrawWireCube(point.position, Vector3.one * 0.05f);
+        //    Handles.Label(point.position, (count++).ToString());
+        //}
     }
 
-    private void InitNodes()
+    public void InitNodes()
     {
         // ...
         length = 0.0f;
-        nodes = new Node[transform.childCount];
 
         // ...
-        for (int i = 0; i < transform.childCount; i++)
+        for(int i = 0; i < nodes.Length; i++)
         {
-            // Fetch current & next child
-            Transform child = transform.GetChild(i);
-            Transform next = ((i + 1) < transform.childCount) ? transform.GetChild(i + 1) : null;
+            // ...
+            if(i + 1 >= nodes.Length)
+                break;
+
+            Node cur = nodes[i];
+            Node next = nodes[i + 1];
+
+            float distance = Vector3.Distance(next.position, cur.position);
 
             // ...
-            float distance = 0.0f;
-            Vector3 forward = Vector3.zero;
 
-            // ...
-            if (next != null)
-            {
-                distance = Vector3.Distance(next.position, child.position);
-                forward = next.position - child.position;
-            }
+            var node = nodes[i];
 
-            // Set values
-            nodes[i].position = child.position;
-            nodes[i].forward = forward;
-            nodes[i].length = distance;
+            node.position = cur.position;
+            node.forward = next.position - cur.position;
+            node.length = distance;
+
+            nodes[i] = node;
+
+
             length += distance;
         }
+
+        points = GeneratePoints().ToArray();
     }
     private IEnumerable<Point> GeneratePoints()
     {
@@ -113,16 +104,16 @@ public class Conveyor : MonoBehaviour
         float increment = length / amount;
 
         // Generate evenly spaced points (this was an absolute pain)
-        for (int count = 1; count <= amount; count++)
+        for(int count = 1; count <= amount; count++)
         {
             // ...
             var node = nodes[index];
 
             // No space remains so switch to the next path
-            if (offset > node.length)
+            if(offset > node.length)
             {
                 // Completed point generation
-                if (nodes[index + 1].isEnd)
+                if(nodes[index + 1].isEnd)
                 {
                     break;
                 }
@@ -140,7 +131,7 @@ public class Conveyor : MonoBehaviour
 
             // ...
             var point = new Point();
-            if (Application.isPlaying)
+            if(Application.isPlaying)
             {
                 point.gameObject = Instantiate(clone, transform);
                 point.transform.position = position;
@@ -168,29 +159,29 @@ public class Conveyor : MonoBehaviour
 }
 
 [Serializable]
-internal struct Node
+public struct Node
 {
-    internal Vector3 position;
-    internal Vector3 forward;
+    public Vector3 position;
+    public Vector3 forward;
 
-    internal float length;
-    internal bool isEnd
+    public float length;
+    public bool isEnd
     {
         get => length <= 0;
     }
 }
 
 [Serializable]
-internal struct Point
+public struct Point
 {
-    internal GameObject gameObject;
-    internal Transform transform => gameObject.transform;
+    public GameObject gameObject;
+    public Transform transform => gameObject.transform;
 
-    internal float offset;
-    internal int node;
+    public float offset;
+    public int node;
 
     // Editor
-    internal Vector3 position;
-    internal Vector3 forward;
-    internal Quaternion rotation;
+    public Vector3 position;
+    public Vector3 forward;
+    public Quaternion rotation;
 }
