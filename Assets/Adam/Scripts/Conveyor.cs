@@ -5,9 +5,9 @@ using UnityEngine;
 
 public class Conveyor : MonoBehaviour
 {
-    private Point[] points;
     public Node[] nodes;
-    private float length;
+    private Point[] points;
+    private float beltLength;
 
     public int amount;
     public GameObject clone;
@@ -40,36 +40,14 @@ public class Conveyor : MonoBehaviour
             }
         }
     }
-    private void OnDrawGizmos()
-    {
-        for(int i = 0; i < nodes.Length; i++)
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(nodes[i].position, 0.1f);
-
-            // Does this node continue?
-            if(nodes[i].isEnd == false)
-            {
-                Gizmos.color = Color.cyan;
-                Gizmos.DrawLine(nodes[i].position, nodes[i + 1].position);
-            }
-        }
-
-        //int count = 1;
-        //foreach(var point in points)
-        //{
-        //    Handles.DrawWireCube(point.position, Vector3.one * 0.05f);
-        //    Handles.Label(point.position, (count++).ToString());
-        //}
-    }
 
     public void InitNodes()
     {
         // ...
-        length = 0.0f;
+        beltLength = 0.0f;
 
         // ...
-        for(int i = 0; i < nodes.Length; i++)
+        for (int i = 0; i < nodes.Length; i++)
         {
             // ...
             if(i + 1 >= nodes.Length)
@@ -91,7 +69,7 @@ public class Conveyor : MonoBehaviour
             nodes[i] = node;
 
 
-            length += distance;
+            beltLength += distance;
         }
 
         points = GeneratePoints().ToArray();
@@ -101,7 +79,7 @@ public class Conveyor : MonoBehaviour
         int index = 0;
         float offset = 0.0f;
 
-        float increment = length / amount;
+        float increment = beltLength / amount;
 
         // Generate evenly spaced points (this was an absolute pain)
         for(int count = 1; count <= amount; count++)
