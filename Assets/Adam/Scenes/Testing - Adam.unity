@@ -3596,11 +3596,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nodes:
-  - position: {x: 0, y: 0, z: 0}
-    forward: {x: 0, y: 0, z: 0}
-    length: 0
-  amount: 0
-  clone: {fileID: 0}
+  - position: {x: 0.5920583, y: -0.40698707, z: 0.60291076}
+    forward: {x: 0.8051656, y: -0.04617417, z: 0.16384462}
+    length: 0.8229634
+  - position: {x: 0.5751972, y: -0.42587322, z: -0.17674473}
+    forward: {x: 0.8051656, y: -0.04617417, z: 0.16384462}
+    length: 0.8229634
+  amount: 5
+  clone: {fileID: 856228208}
 --- !u!1 &1994333162
 GameObject:
   m_ObjectHideFlags: 0

@@ -22,14 +22,14 @@ public class Conveyor : MonoBehaviour
         {
             var point = points[i];
 
+            // Translate object over time
             var time = Time.deltaTime;
-
             points[i].transform.position += point.transform.forward * time;
             points[i].offset += time;
 
             if(point.offset > nodes[point.node].length)
             {
-                points[i].node = !nodes[point.node].isEnd ? point.node + 1 : 0;
+                points[i].node = nodes[point.node].isEnd == false ? point.node + 1 : 0;
                 points[i].offset = 0.0f;
 
                 point = points[i];
