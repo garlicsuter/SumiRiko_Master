@@ -41,8 +41,10 @@ public class ConveyorEditor : Editor
 
         for (int i = 0; i < c_target.nodes.Length; i++)
         {
+            // Style text
             var style = new GUIStyle();
             style.normal.textColor = Color.black;
+
             Handles.Label(c_target.nodes[i].position + (Vector3.up * 0.25f), $"{i}", style);
 
             Handles.color = Color.cyan;
@@ -51,30 +53,30 @@ public class ConveyorEditor : Editor
                 Handles.DrawDottedLine(c_target.nodes[i].position, c_target.nodes[i + 1].position, 5f);
             }
 
-            float dist = HandleUtility.DistanceToCircle(c_target.nodes[i].position, 0.1f);
-            selected = dist == 0 ? i : -1;
-
-            if (selected == i)
-            {
-                c_target.nodes[i].position = Handles.PositionHandle(c_target.nodes[i].position, Quaternion.identity);
-
-                // Mouse events are unreliable so exclude them altogether...
-                if (evt.modifiers == EventModifiers.Shift && cloned == false)
-                {
-                    cloned = true;
-
-                    // ...
-                    var list = new List<Node>(c_target.nodes);
-                    list.Insert(selected + 1, c_target.nodes[i]);
-                    c_target.nodes = list.ToArray();
-
-                    selected += 1;
-                }
-            }
-            else
+            // Use a button to select elements
+            if (selected != i)
             {
                 Handles.color = Color.white;
-                Handles.DrawWireCube(c_target.nodes[i].position, Vector3.one * 0.1f);
+
+                bool pressed = Handles.Button(c_target.nodes[i].position, Quaternion.identity, 0.125f, 0.125f, Handles.SphereHandleCap);
+                selected = pressed ? i : selected;
+            }
+        }
+
+        if (selected != -1)
+        {
+            c_target.nodes[selected].position = Handles.PositionHandle(c_target.nodes[selected].position, Quaternion.identity);
+
+            // Mouse events are unreliable so exclude them altogether...
+            if (evt.modifiers == EventModifiers.Shift && cloned == false)
+            {
+                // ...
+                var list = new List<Node>(c_target.nodes);
+                list.Insert(selected + 1, c_target.nodes[selected]);
+                c_target.nodes = list.ToArray();
+
+                cloned = true;
+                selected += 1;
             }
         }
     }

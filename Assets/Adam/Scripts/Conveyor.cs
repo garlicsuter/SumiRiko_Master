@@ -112,6 +112,7 @@ public class Conveyor : MonoBehaviour
             if(Application.isPlaying)
             {
                 point.gameObject = Instantiate(clone, transform);
+                point.gameObject.active = true; // GameObjects spawned disabled?
                 point.transform.position = position;
                 point.transform.forward = forward;
                 point.transform.rotation = rotation;

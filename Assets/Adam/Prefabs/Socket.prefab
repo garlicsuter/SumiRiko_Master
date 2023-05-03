@@ -46,5 +46,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   angles: {x: 45, y: 45, z: 35}
   size: 0.1
-  speedRatio: 0.5
+  speedRatio: 0.25
   material: {fileID: 2100000, guid: f3f01728fd58ff34d82e4981ea93b0b3, type: 2}
