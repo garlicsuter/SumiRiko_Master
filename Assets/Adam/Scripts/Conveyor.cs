@@ -18,25 +18,26 @@ public class Conveyor : MonoBehaviour
     }
     private void Update()
     {
-        for(int i = 0; i < points.Length; i++)
+        for (int i = 0; i < points.Length; i++)
         {
-            var point = points[i];
+            Node current = nodes[points[i].current];
 
-            // Translate object over time
-            var time = Time.deltaTime;
-            points[i].transform.position += point.transform.forward * time;
-            points[i].offset += time;
+            // ...
+            float movement = Time.deltaTime * 1f;
+            points[i].offset += movement;
+            points[i].transform.position = current.position + (points[i].transform.forward * points[i].offset);
 
-            if(point.offset > nodes[point.node].length)
+            if (points[i].offset > current.length)
             {
-                points[i].node = nodes[point.node].isEnd == false ? point.node + 1 : 0;
-                points[i].offset = 0.0f;
+                var next = points[i].current + 1;
+                points[i].current = nodes[next].isEnd == false ? next : 0;
 
-                point = points[i];
+                points[i].offset -= current.length;
+                current = nodes[points[i].current];
 
-                points[i].transform.position = nodes[point.node].position;
-                points[i].transform.forward = nodes[point.node].forward;
-                points[i].transform.rotation = Quaternion.LookRotation(nodes[point.node].forward);
+                points[i].transform.position = current.position;
+                points[i].transform.forward = current.forward;
+                points[i].transform.rotation = Quaternion.LookRotation(current.forward);
             }
         }
     }
@@ -51,7 +52,10 @@ public class Conveyor : MonoBehaviour
         {
             // ...
             if(i + 1 >= nodes.Length)
+            {
+                nodes[i].isEnd = true;
                 break;
+            }
 
             Node cur = nodes[i];
             Node next = nodes[i + 1];
@@ -59,15 +63,9 @@ public class Conveyor : MonoBehaviour
             float distance = Vector3.Distance(next.position, cur.position);
 
             // ...
-
-            var node = nodes[i];
-
-            node.position = cur.position;
-            node.forward = next.position - cur.position;
-            node.length = distance;
-
-            nodes[i] = node;
-
+            nodes[i].position = cur.position;
+            nodes[i].forward = next.position - cur.position;
+            nodes[i].length = distance;
 
             beltLength += distance;
         }
@@ -117,17 +115,10 @@ public class Conveyor : MonoBehaviour
                 point.transform.forward = forward;
                 point.transform.rotation = rotation;
             }
-            // Editor
-            else
-            {
-                point.position = position;
-                point.forward = forward;
-                point.rotation = rotation;
-            }
 
             // ...
             point.offset = offset;
-            point.node = index;
+            point.current = index;
 
             // ...
             offset += increment;
@@ -144,10 +135,7 @@ public struct Node
     public Vector3 forward;
 
     public float length;
-    public bool isEnd
-    {
-        get => length <= 0;
-    }
+    public bool isEnd;
 }
 
 [Serializable]
@@ -157,10 +145,5 @@ public struct Point
     public Transform transform => gameObject.transform;
 
     public float offset;
-    public int node;
-
-    // Editor
-    public Vector3 position;
-    public Vector3 forward;
-    public Quaternion rotation;
+    public int current;
 }

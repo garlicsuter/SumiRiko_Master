@@ -5,9 +5,7 @@ using System.Collections.Generic;
 [CustomEditor(typeof(Conveyor))]
 public class ConveyorEditor : Editor
 {
-    private bool cloned = false;
-
-    private bool shiftDown;
+    private bool shiftDown, cloned, altDown, canDeleteNode;
 
     private int selected = -1;
 
@@ -18,13 +16,9 @@ public class ConveyorEditor : Editor
 
         EditorGUI.BeginChangeCheck();
 
-        c_target.amount = EditorGUILayout.IntField("Amount", c_target.amount);
+        EditorGUILayout.PropertyField(serializedObject.FindProperty("nodes"));
 
-        for (int i = 0; i < c_target.nodes.Length; i++)
-        {
-            var old = c_target.nodes[i].position;
-            c_target.nodes[i].position = EditorGUILayout.Vector3Field($"Node: {i + 1}", old);
-        }
+        c_target.amount = EditorGUILayout.IntField("Amount", c_target.amount);
 
         if (EditorGUI.EndChangeCheck())
         {
@@ -37,6 +31,7 @@ public class ConveyorEditor : Editor
         Event evt = Event.current;
         var c_target = target as Conveyor;
 
+        ResetAlt(evt);
         ResetShift(evt);
 
         for (int i = 0; i < c_target.nodes.Length; i++)
@@ -53,7 +48,7 @@ public class ConveyorEditor : Editor
                 Handles.DrawDottedLine(c_target.nodes[i].position, c_target.nodes[i + 1].position, 5f);
             }
 
-            // Use a button to select elements
+            // Select the specific node that the user clicked on
             if (selected != i)
             {
                 Handles.color = Color.white;
@@ -63,11 +58,12 @@ public class ConveyorEditor : Editor
             }
         }
 
+        // ...
         if (selected != -1)
         {
             c_target.nodes[selected].position = Handles.PositionHandle(c_target.nodes[selected].position, Quaternion.identity);
 
-            // Mouse events are unreliable so exclude them altogether...
+            // Insert a node after the current selection
             if (evt.modifiers == EventModifiers.Shift && cloned == false)
             {
                 // ...
@@ -77,10 +73,34 @@ public class ConveyorEditor : Editor
 
                 cloned = true;
                 selected += 1;
+
+            }
+            // Delete the node that is currently selected
+            if (evt.modifiers == EventModifiers.Alt && canDeleteNode && c_target.nodes.Length > 1)
+            {
+                // ...
+                var list = new List<Node>(c_target.nodes);
+                list.RemoveAt(selected);
+                c_target.nodes = list.ToArray();
+
+                canDeleteNode = false;
+                selected -= 1;
             }
         }
     }
 
+    private void ResetAlt(Event evt)
+    {
+        if (evt.modifiers == EventModifiers.Alt)
+        {
+            altDown = true;
+        }
+        else if (altDown == true)
+        {
+            altDown = false;
+            canDeleteNode = true;
+        }
+    }
     private void ResetShift(Event evt)
     {
         if (evt.modifiers == EventModifiers.Shift)
