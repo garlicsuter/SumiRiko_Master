@@ -54,11 +54,13 @@ public class Socket : MonoBehaviour
             {
                 // Lerp position to the center of the socket
                 float distance = Vector3.Distance(child.transform.position, transform.position);
-                child.transform.position = distance <= 0.001f ? transform.position : Vector3.Lerp(child.transform.position, transform.position, speed * Time.deltaTime);
+                //child.transform.position = distance <= 0.001f ? transform.position : Vector3.Lerp(child.transform.position, transform.position, speed * Time.deltaTime);
+                child.transform.position = transform.position;
 
                 // Lerp rotation to the forward direction of the socket
                 float angle = Quaternion.Angle(child.transform.rotation, transform.rotation);
-                child.transform.rotation = angle <= 0.5f ? transform.rotation : Quaternion.Lerp(child.transform.rotation, transform.rotation, speed * Time.deltaTime);
+                //child.transform.rotation = angle <= 0.5f ? transform.rotation : Quaternion.Lerp(child.transform.rotation, transform.rotation, speed * Time.deltaTime);
+                child.transform.rotation = transform.rotation;
             }
             else
             {
