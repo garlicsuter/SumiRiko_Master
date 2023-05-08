@@ -1,0 +1,1 @@
+Click on object with script applied to edit path, click on nodes to select an item, shift will "extrude"/copy the object from that index, and alt will delete the selected object.

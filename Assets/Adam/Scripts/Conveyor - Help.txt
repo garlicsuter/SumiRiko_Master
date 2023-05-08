@@ -1,1 +1,0 @@
--Position empty game objects as children of a parent game object with the script applied. Entering play mode will update the path.
