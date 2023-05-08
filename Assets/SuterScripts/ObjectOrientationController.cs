@@ -33,6 +33,8 @@ public class ObjectOrientationController : MonoBehaviour
 
     public Material materialInRange;
     public Material materialNotInRange;
+    public Material whiteGhost;
+    //public GameObject sphereToLightUp;
 
     //[SerializeField] XRBaseController controller; 
     //Haptic Feedback (In Progress)
@@ -60,6 +62,7 @@ public class ObjectOrientationController : MonoBehaviour
             //Sets Socket to True, Thus Object is Insertable
 
             GetComponent<Renderer>().material = materialInRange;
+            //sphereToLightUp.GetComponent<Renderer>().material = materialInRange;
             //Changes Color of Object to Inserted Color in Inspector for Material In Range
 
             //controller.SendHapticImpulse(0.7f, 0.2f); (Not Working)
@@ -74,6 +77,7 @@ public class ObjectOrientationController : MonoBehaviour
             //Sets Socket to False, Thus Object in Uninsertable
 
             GetComponent<Renderer>().material = materialNotInRange;
+            //sphereToLightUp.GetComponent<Renderer>().material = materialNotInRange;
             //Changes Color of Object to Inserted Color in Inspector for Material Not In Range
 
             // Things that Happen When It is Not In Range

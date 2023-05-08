@@ -7,16 +7,14 @@ using UnityEngine.XR.Interaction.Toolkit;
 /// </summary>
 public class Socket : MonoBehaviour
 {
-    // References
     private XRRayInteractor rightController, leftController;
-    private SocketChild child = new SocketChild();
-    private MeshRenderer meshRenderer;
 
-    public Color OverlayColor
-    {
-        get => meshRenderer.material.color;
-        set => meshRenderer.material.color = value;
-    }
+    private GenericObject child = new GenericObject();
+    private GenericObject clone = new GenericObject();
+
+    private GameObject heldObject;
+
+    public Material material;
 
     // TODO: Make it ratio between 0 to 1 where radius impacts speed?
     public float lerpSpeed = 5.0f;
@@ -28,13 +26,9 @@ public class Socket : MonoBehaviour
 
     private void Start()
     {
-        // Controllers
         rightController = GameObject.Find("LeftHand Controller").GetComponent<XRRayInteractor>();
         leftController = GameObject.Find("RightHand Controller").GetComponent<XRRayInteractor>();
 
-        meshRenderer = gameObject.GetComponent<MeshRenderer>();
-
-        // Trigger
         var collider = gameObject.AddComponent<SphereCollider>();
         collider.hideFlags = HideFlags.HideInInspector;
         collider.isTrigger = true;
@@ -43,79 +37,86 @@ public class Socket : MonoBehaviour
 
     private void Update()
     {
-        if(child.gameObject != null)
+        if (child.gameObject != null)
         {
-            Debug.Log("child.gameObject is NOT null!");
-            if(!IsGrabbed(child.gameObject))
+            if (!IsGrabbed(child.gameObject))
             {
-                Debug.Log("Child is NOT grabbed anymore");
-                // Lerp child to the center of the socket
-                float distance = Vector3.Distance(child.gameObject.transform.position, transform.position);
-                if(distance <= 0.001f)
-                {
-                    child.gameObject.transform.position = transform.position;
-                }
-                else
-                {
-                    child.gameObject.transform.position = Vector3.Lerp(child.gameObject.transform.position, transform.position, lerpSpeed * Time.deltaTime);
-                }
+                // Lerp child position to the center of the socket
+                float distance = Vector3.Distance(child.transform.position, transform.position);
+                child.transform.position = distance <= 0.001f ? transform.position : Vector3.Lerp(child.transform.position, transform.position, lerpSpeed * Time.deltaTime);
+
+                // Lerp child rotation to the forward direction of the socket
+                float angle = Quaternion.Angle(child.transform.rotation, transform.rotation);
+                child.transform.rotation = angle <= 1 ? transform.rotation : Quaternion.Lerp(child.transform.rotation, transform.rotation, lerpSpeed * Time.deltaTime);
             }
             else
             {
                 RemoveChild();
             }
         }
-        else
-        {
-            // Ensure that children get detached from the parent
-            if(transform.childCount > 0)
-            {
-                transform.DetachChildren();
-            }
-        }
     }
 
     private void OnTriggerStay(Collider other)
     {
-        if(child.gameObject == null)
+        if (child.gameObject == null)
         {
-            var obj = other.gameObject;
-            Debug.Log("the obj = " + obj);
-            // Modify color of the socket based off
-            // of the transform of the held object
-            if(IsValid(obj))
+            heldObject = other.gameObject;
+
+            // Create a clone of the held object as a visual aid
+            if (clone.gameObject == null)
             {
-                OverlayColor = Color.green;
+                // Fetch values
+                clone.gameObject = new GameObject("Clone");
+                clone.filter = clone.gameObject.AddComponent<MeshFilter>();
+                clone.renderer = clone.gameObject.AddComponent<MeshRenderer>();
 
-                // Releasing the object will confirm the selection
-                if(!IsGrabbed(obj))
+                // Copy values
+                clone.filter.mesh = heldObject.GetComponent<MeshFilter>().sharedMesh;
+                clone.renderer.material = material;
+                clone.transform.SetParent(transform);
+                clone.transform.position = transform.position;
+                clone.transform.rotation = transform.rotation;
+                clone.transform.localScale = heldObject.transform.localScale;
+            }
+
+            // Check for a valid orientation
+            if (IsValid(heldObject))
+            {
+                clone.color = Color.green;
+
+                // Release the object to confirm selection
+                if (!IsGrabbed(heldObject))
                 {
-                    child.gameObject = obj;
-                    child.body = obj.GetComponent<Rigidbody>();
+                    child.gameObject = heldObject;
+                    child.body = heldObject.GetComponent<Rigidbody>();
 
-                    child.gameObject.transform.SetParent(transform);
+                    child.transform.SetParent(transform);
                     child.body.isKinematic = true;
 
-                    // Preserve horizontal rotation
-                    child.gameObject.transform.rotation = Quaternion.Euler(0, child.gameObject.transform.rotation.eulerAngles.y, 0);
-
-                    OverlayColor = Color.clear;
+                    // Remove visual on confirmation
+                    clone.Destroy();
                 }
             }
             else
             {
-                OverlayColor = Color.red;
+                clone.color = Color.red;
             }
         }
     }
 
-    // NOTE: I have no idea if this even does anything
     private void OnTriggerExit(Collider collider)
     {
         Vector3 point = collider.ClosestPoint(transform.position);
         float distance = Vector3.Distance(point, transform.position);
 
-        if(collider.gameObject == child.gameObject && distance > radius)
+        // Remove visual
+        if (collider.gameObject == heldObject && distance >= radius)
+        {
+            heldObject = null;
+            clone.Destroy();
+        }
+
+        if (collider.gameObject == child.gameObject && distance >= radius)
         {
             RemoveChild();
         }
@@ -124,18 +125,18 @@ public class Socket : MonoBehaviour
     /// <summary>
     /// Does the user have this object in their hand?
     /// </summary>
-    private bool IsGrabbed(GameObject obj)
+    public bool IsGrabbed(GameObject obj)
     {
-        if(rightController.hasSelection)
+        if (rightController.hasSelection)
         {
-            if(rightController.interactablesSelected[0].transform.gameObject == obj)
+            if (rightController.interactablesSelected[0].transform.gameObject == obj)
             {
                 return true;
             }
         }
-        if(leftController.hasSelection)
+        if (leftController.hasSelection)
         {
-            if(leftController.interactablesSelected[0].transform.gameObject == obj)
+            if (leftController.interactablesSelected[0].transform.gameObject == obj)
             {
                 return true;
             }
@@ -153,9 +154,18 @@ public class Socket : MonoBehaviour
         return angle <= tolerance;
     }
 
+    /// <summary>
+    /// Remove and dereference the child
+    /// </summary>
     private void RemoveChild()
     {
-        child.body.isKinematic = false;
+        // Wait until the user has dropped the child before resetting it
+        if (child.gameObject.GetComponent<SocketChildReset>() == null)
+        {
+            var comp = child.gameObject.AddComponent<SocketChildReset>();
+            var func = comp.Wait(this, child.gameObject);
+            StartCoroutine(func);
+        }
 
         child.gameObject = null;
         child.body = null;
@@ -186,8 +196,30 @@ public class Socket : MonoBehaviour
 }
 
 [Serializable]
-internal class SocketChild
+internal struct GenericObject
 {
-    public GameObject gameObject = null;
-    public Rigidbody body = null;
+    public GameObject gameObject;
+    public Rigidbody body;
+    public MeshFilter filter;
+    public MeshRenderer renderer;
+
+    public Color color
+    {
+        get => renderer.material.color;
+        set => renderer.material.color = value;
+    }
+    public Transform transform
+    {
+        get => gameObject.transform;
+    }
+
+    public void Destroy()
+    {
+        UnityEngine.Object.Destroy(gameObject);
+
+        gameObject = null;
+        body = null;
+        filter = null;
+        renderer = null;
+    }
 }
