@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -12,61 +12,76 @@ public class Conveyor : MonoBehaviour
     public int amount;
     public GameObject clone;
 
-    private void Start()
-    {
-        InitNodes();
-    }
+    private void Start() => InitNodes();
     private void Update()
     {
-        for (int i = 0; i < points.Length; i++)
+        // Iterate through each point to update transform
+        for(int i = 0; i < points.Length; i++)
         {
+            // Helper
             Node current = nodes[points[i].current];
 
-            // ...
-            float movement = Time.deltaTime * 1f;
-            points[i].offset += movement;
-            points[i].transform.position = current.position + (points[i].transform.forward * points[i].offset);
+            // Increment offset
+            points[i].offset += Time.deltaTime;
 
-            if (points[i].offset > current.length)
+            // Calculate position
+            points[i].transform.position = (current.forward * points[i].offset) + current.position;
+
+            // Modify current node
+            if(points[i].offset > current.length)
             {
-                var next = points[i].current + 1;
-                points[i].current = nodes[next].isEnd == false ? next : 0;
-
+                int next = points[i].current + 1;
                 points[i].offset -= current.length;
+
+                points[i].current = nodes[next].isEnd ? 0 : next;
                 current = nodes[points[i].current];
 
+                // ...
                 points[i].transform.position = current.position;
                 points[i].transform.forward = current.forward;
-                points[i].transform.rotation = Quaternion.LookRotation(current.forward);
+                points[i].transform.rotation = current.rotation;
             }
         }
     }
 
     public void InitNodes()
     {
-        // ...
-        beltLength = 0.0f;
+        // Runtime edits
+        if(Application.isPlaying)
+        {
+            // Destroy the children 😈
+            for(int i = 0; i < transform.childCount; i++)
+            {
+                Destroy(transform.GetChild(i).gameObject);
+            }
+
+            // ...
+            beltLength = 0.0f;
+        }
 
         // ...
-        for (int i = 0; i < nodes.Length; i++)
+        for(int i = 0; i < nodes.Length; i++)
         {
-            // ...
+            // Mark endpoint
             if(i + 1 >= nodes.Length)
             {
                 nodes[i].isEnd = true;
                 break;
             }
 
-            Node cur = nodes[i];
+            // Helpers
+            Node current = nodes[i];
             Node next = nodes[i + 1];
-
-            float distance = Vector3.Distance(next.position, cur.position);
+            float distance = Vector3.Distance(next.position, current.position);
+            Vector3 forward = (next.position - current.position).normalized;
 
             // ...
-            nodes[i].position = cur.position;
-            nodes[i].forward = next.position - cur.position;
+            nodes[i].position = current.position;
+            nodes[i].forward = forward;
+            nodes[i].rotation = Quaternion.LookRotation(forward);
             nodes[i].length = distance;
 
+            // Increment total length
             beltLength += distance;
         }
 
@@ -101,19 +116,14 @@ public class Conveyor : MonoBehaviour
             }
 
             // ...
-            Vector3 position = node.position + (offset * node.forward.normalized);
-            Vector3 forward = node.forward;
-            Quaternion rotation = Quaternion.LookRotation(node.forward);
-
-            // ...
             var point = new Point();
             if(Application.isPlaying)
             {
                 point.gameObject = Instantiate(clone, transform);
-                point.gameObject.active = true; // GameObjects spawned disabled?
-                point.transform.position = position;
-                point.transform.forward = forward;
-                point.transform.rotation = rotation;
+                point.gameObject.SetActive(true); // GameObjects spawned disabled?
+                point.transform.position = (node.forward * offset) + node.position;
+                point.transform.forward = node.forward;
+                point.transform.rotation = node.rotation;
             }
 
             // ...
@@ -133,6 +143,7 @@ public struct Node
 {
     public Vector3 position;
     public Vector3 forward;
+    public Quaternion rotation;
 
     public float length;
     public bool isEnd;

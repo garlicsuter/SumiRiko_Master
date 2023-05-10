@@ -5,112 +5,137 @@ using System.Collections.Generic;
 [CustomEditor(typeof(Conveyor))]
 public class ConveyorEditor : Editor
 {
-    private bool shiftDown, cloned, altDown, canDeleteNode;
+    private Conveyor c_target => target as Conveyor;
 
-    private int selected = -1;
+    private int selection = -1;
 
     public override void OnInspectorGUI()
     {
-        Event gui_event = Event.current;
-        var c_target = target as Conveyor;
-
         EditorGUI.BeginChangeCheck();
 
+        // Inspector values
         EditorGUILayout.PropertyField(serializedObject.FindProperty("nodes"));
-
         c_target.amount = EditorGUILayout.IntField("Amount", c_target.amount);
 
-        if (EditorGUI.EndChangeCheck())
+        // Will at least one node into existance
+        if(c_target.nodes.Length == 0)
         {
-            c_target.InitNodes();
+            c_target.nodes = new Node[1];
+        }
+
+        if(EditorGUI.EndChangeCheck())
+        {
+            serializedObject.ApplyModifiedProperties();
+            OnNodeChange();
         }
     }
 
     public void OnSceneGUI()
     {
+        // ...
         Event evt = Event.current;
-        var c_target = target as Conveyor;
 
-        ResetAlt(evt);
-        ResetShift(evt);
-
-        for (int i = 0; i < c_target.nodes.Length; i++)
+        // Handle input modifiers
+        if(evt.isKey && evt.type == EventType.KeyUp)
         {
-            // Style text
+            switch(evt.keyCode)
+            {
+                case KeyCode.RightShift:
+                case KeyCode.LeftShift:
+                    InsertNode();
+                    break;
+
+                case KeyCode.RightAlt:
+                case KeyCode.LeftAlt:
+                    DeleteNode();
+                    break;
+            }
+        }
+
+        // Handle selection and draw nodes
+        for(int i = 0; i < c_target.nodes.Length; i++)
+        {
+            // Draw styled text
             var style = new GUIStyle();
             style.normal.textColor = Color.black;
-
             Handles.Label(c_target.nodes[i].position + (Vector3.up * 0.25f), $"{i}", style);
 
+            // Draw dotted lines
             Handles.color = Color.cyan;
-            if (c_target.nodes.Length > i + 1)
+            if(c_target.nodes.Length > i + 1)
             {
                 Handles.DrawDottedLine(c_target.nodes[i].position, c_target.nodes[i + 1].position, 5f);
             }
 
             // Select the specific node that the user clicked on
-            if (selected != i)
+            if(selection != i)
             {
                 Handles.color = Color.white;
 
                 bool pressed = Handles.Button(c_target.nodes[i].position, Quaternion.identity, 0.125f, 0.125f, Handles.SphereHandleCap);
-                selected = pressed ? i : selected;
+                selection = pressed ? i : selection;
             }
         }
 
-        // ...
-        if (selected != -1)
+        // Something is selected so deal with it
+        if(selection != -1)
         {
-            c_target.nodes[selected].position = Handles.PositionHandle(c_target.nodes[selected].position, Quaternion.identity);
+            Vector3 newPos = Handles.PositionHandle(c_target.nodes[selection].position, Quaternion.identity);
 
-            // Insert a node after the current selection
-            if (evt.modifiers == EventModifiers.Shift && cloned == false)
+            if(newPos != c_target.nodes[selection].position)
             {
-                // ...
-                var list = new List<Node>(c_target.nodes);
-                list.Insert(selected + 1, c_target.nodes[selected]);
-                c_target.nodes = list.ToArray();
-
-                cloned = true;
-                selected += 1;
-
+                c_target.nodes[selection].position = newPos;
+                OnNodeChange();
             }
-            // Delete the node that is currently selected
-            if (evt.modifiers == EventModifiers.Alt && canDeleteNode && c_target.nodes.Length > 1)
+        }
+    }
+
+    /// <summary>
+    /// Insert a node after the current selection
+    /// </summary>
+    private void InsertNode()
+    {
+        // Design decision requires the use of this method
+        var list = new List<Node>(c_target.nodes);
+        list.Insert(selection + 1, c_target.nodes[selection]);
+        c_target.nodes = list.ToArray();
+
+        // Modify endpoint
+        if(c_target.nodes[selection].isEnd)
+        {
+            c_target.nodes[selection].isEnd = false;
+            c_target.nodes[selection + 1].isEnd = true;
+        }
+
+        selection += 1;
+
+        OnNodeChange();
+    }
+
+    /// <summary>
+    /// Delete the selection
+    /// </summary>
+    private void DeleteNode()
+    {
+        // Ignore the first node
+        if(selection > 0)
+        {
+            // Modify endpoint
+            if(c_target.nodes[selection].isEnd)
             {
-                // ...
-                var list = new List<Node>(c_target.nodes);
-                list.RemoveAt(selected);
-                c_target.nodes = list.ToArray();
-
-                canDeleteNode = false;
-                selected -= 1;
+                c_target.nodes[selection - 1].isEnd = true;
             }
+
+            // Design decision requires the use of this method
+            var list = new List<Node>(c_target.nodes);
+            list.RemoveAt(selection);
+            c_target.nodes = list.ToArray();
+
+            selection -= 1;
+
+            OnNodeChange();
         }
     }
 
-    private void ResetAlt(Event evt)
-    {
-        if (evt.modifiers == EventModifiers.Alt)
-        {
-            altDown = true;
-        }
-        else if (altDown == true)
-        {
-            altDown = false;
-            canDeleteNode = true;
-        }
-    }
-    private void ResetShift(Event evt)
-    {
-        if (evt.modifiers == EventModifiers.Shift)
-        {
-            shiftDown = true;
-        }
-        else if (shiftDown == true)
-        {
-            shiftDown = false;
-            cloned = false;
-        }
-    }
+    private void OnNodeChange() => c_target.InitNodes();
 }

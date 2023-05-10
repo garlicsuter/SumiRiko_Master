@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0.12731749, g: 0.13414757, b: 0.1210787, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -905,7 +905,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &66240617
 Transform:
   m_ObjectHideFlags: 0
@@ -940,7 +940,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!64 &314680595
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -1471,7 +1471,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &657963073
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1782,7 +1782,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1178124317
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2685,7 +2685,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!54 &1644133947
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2958,7 +2958,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!108 &1661278778
 Light:
   m_ObjectHideFlags: 0
@@ -3072,7 +3072,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1663801505
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3117,7 +3117,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1785040389
 Transform:
   m_ObjectHideFlags: 0
@@ -3217,43 +3217,72 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nodes:
-  - position: {x: -0.9150651, y: 0, z: -0.31917036}
-    forward: {x: 0, y: 0, z: 2}
-    length: 2
+  - position: {x: 1.8900747, y: 0, z: -3.3066072}
+    forward: {x: -0.9442304, y: 0, z: 0.32928574}
+    rotation: {x: 0, y: -0.5791003, z: -0, w: 0.81525636}
+    length: 2.364194
     isEnd: 0
-  - position: {x: -1.1964519, y: 0, z: 0.5033363}
-    forward: {x: 0, y: 0, z: 2}
-    length: 2
+  - position: {x: -0.34226894, y: 0, z: -2.528112}
+    forward: {x: 0.059111536, y: 0, z: 0.9982513}
+    rotation: {x: 0, y: 0.029568702, z: 0, w: 0.9995628}
+    length: 4.1622906
     isEnd: 0
-  - position: {x: -1.1610122, y: 0, z: 1.7609897}
-    forward: {x: 0, y: 0, z: 2}
-    length: 2
+  - position: {x: -0.09622955, y: 0, z: 1.6269002}
+    forward: {x: 0.99719393, y: 0, z: 0.07486215}
+    rotation: {x: 0, y: 0.68012416, z: 0, w: 0.73309696}
+    length: 2.0833414
     isEnd: 0
-  - position: {x: -0.89667046, y: 0, z: 3.8237123}
-    forward: {x: 0, y: 0, z: 2}
-    length: 2
+  - position: {x: 1.9812658, y: 0, z: 1.7828636}
+    forward: {x: 0.96707, y: 0, z: -0.25451058}
+    rotation: {x: 0, y: 0.7919945, z: 0, w: 0.6105283}
+    length: 2.153251
     isEnd: 0
-  - position: {x: 0, y: 0, z: 2}
-    forward: {x: 2, y: 0, z: 2}
-    length: 2.828427
+  - position: {x: 4.06361, y: 0, z: 1.2348385}
+    forward: {x: 0.20439516, y: 0, z: -0.9788885}
+    rotation: {x: 0, y: 0.9947081, z: 0, w: 0.10274128}
+    length: 2.3694935
     isEnd: 0
-  - position: {x: 2, y: 0, z: 4}
-    forward: {x: -1, y: 0, z: -2}
-    length: 2.236068
+  - position: {x: 4.547923, y: 0, z: -1.0846314}
+    forward: {x: -0.2520959, y: 0, z: -0.96770227}
+    rotation: {x: 0, y: 0.9918927, z: 0, w: -0.12707822}
+    length: 3.9942837
     isEnd: 0
-  - position: {x: 1, y: 0, z: 2}
-    forward: {x: 0, y: 0, z: -2.25}
-    length: 2.25
+  - position: {x: 3.5409806, y: 0, z: -4.9499087}
+    forward: {x: -0.96879876, y: 0, z: -0.24784887}
+    rotation: {x: 0, y: -0.78988886, z: 0, w: 0.61325}
+    length: 3.2423382
     isEnd: 0
-  - position: {x: 1, y: 0, z: -0.25}
-    forward: {x: 2.25, y: 0, z: 2.25}
-    length: 3.1819806
+  - position: {x: 0.39980745, y: 0, z: -5.7535186}
+    forward: {x: -0.9232295, y: 0, z: 0.384249}
+    rotation: {x: 0, y: -0.55486536, z: -0, w: 0.8319402}
+    length: 5.7096014
     isEnd: 0
-  - position: {x: 3.25, y: 0, z: 2}
-    forward: {x: 5, y: 0, z: 5}
-    length: 7.071068
+  - position: {x: -4.871465, y: 0, z: -3.55961}
+    forward: {x: -0.11427199, y: 0, z: 0.9934495}
+    rotation: {x: 0, y: -0.057229802, z: -0, w: 0.99836105}
+    length: 5.0073457
+    isEnd: 0
+  - position: {x: -5.4436646, y: 0, z: 1.4149351}
+    forward: {x: 0.51445615, y: 0, z: 0.85751665}
+    rotation: {x: 0, y: 0.26691136, z: 0, w: 0.9637211}
+    length: 5.4050164
+    isEnd: 0
+  - position: {x: -2.6630206, y: 0, z: 6.0498266}
+    forward: {x: 0.9939892, y: 0, z: -0.10947838}
+    rotation: {x: 0, y: 0.74480814, z: 0, w: 0.6672787}
+    length: 5.7474756
+    isEnd: 0
+  - position: {x: 3.0499082, y: 0, z: 5.4206023}
+    forward: {x: 0.5790294, y: 0, z: -0.81530666}
+    rotation: {x: 0, y: 0.9527084, z: 0, w: 0.30388594}
+    length: 5.600295
+    isEnd: 0
+  - position: {x: 6.2926435, y: 0, z: 0.8546443}
+    forward: {x: -0.98711205, y: 0, z: 0.16003092}
+    rotation: {x: 0, y: -0.64806217, z: -0, w: 0.7615875}
+    length: 1.9330939
     isEnd: 1
-  amount: 25
+  amount: 50
   clone: {fileID: 4563262600362309666, guid: 7f5ffd041e07caf4fa27ccc00a4e7984, type: 3}
 --- !u!1 &1994333162
 GameObject:
@@ -3271,7 +3300,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1994333163
 MonoBehaviour:
   m_ObjectHideFlags: 0
