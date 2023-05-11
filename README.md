@@ -2,6 +2,7 @@
 (by Mr. Suter and his students at Elida High School, Ohio)
 grit9.com
 
+[Notes Doc](https://liveelidak12oh-my.sharepoint.com/:w:/g/personal/msuter_elida_k12_oh_us/EX705NHvkHRCrnDKj1j1E0gBt8rSjAtLKTzZAMygS6R7gQ?e=XqfuoU)
 ### 0.1
 
 #### Scene Needs:

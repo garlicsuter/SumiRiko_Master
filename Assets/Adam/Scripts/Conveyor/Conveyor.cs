@@ -12,7 +12,14 @@ public class Conveyor : MonoBehaviour
     public int amount;
     public GameObject clone;
 
-    private void Start() => InitNodes();
+    private void Start()
+    {
+        InitNodes();
+        if(clone == null)
+        {
+            Debug.LogError("Provide a reference gameobject in the conveyor script. Inspector -> Debug Mode");
+        }
+    }
     private void Update()
     {
         // Iterate through each point to update transform
@@ -22,7 +29,7 @@ public class Conveyor : MonoBehaviour
             Node current = nodes[points[i].current];
 
             // Increment offset
-            points[i].offset += Time.deltaTime;
+            points[i].offset += Time.deltaTime * 0.1f;
 
             // Calculate position
             points[i].transform.position = (current.forward * points[i].offset) + current.position;
@@ -32,6 +39,12 @@ public class Conveyor : MonoBehaviour
             {
                 int next = points[i].current + 1;
                 points[i].offset -= current.length;
+
+                // SHOWCASE CODE
+                if(nodes[next].isEnd && points[i].transform.childCount > 0)
+                {
+                    Destroy(points[i].transform.GetChild(0).gameObject);
+                }
 
                 points[i].current = nodes[next].isEnd ? 0 : next;
                 current = nodes[points[i].current];

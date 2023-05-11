@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: ce7c92a9c7d439d4bb9b9a9b8031fdc8
+guid: 630c71caedfef3d48aab0ab8a20e06b2
 ModelImporter:
   serializedVersion: 21300
   internalIDToNameTable: []
@@ -47,7 +47,7 @@ ModelImporter:
     nodeNameCollisionStrategy: 1
     fileIdsGeneration: 2
     swapUVChannels: 0
-    generateSecondaryUV: 0
+    generateSecondaryUV: 1
     useFileUnits: 1
     keepQuads: 0
     weldVertices: 1
