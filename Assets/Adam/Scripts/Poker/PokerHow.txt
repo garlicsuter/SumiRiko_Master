@@ -1,0 +1,1 @@
+Hand with tool must be in cylinder collider and reasonable angles [similar to socket] to insert into part. Position tool based off of tool hand up axis relative to part.
