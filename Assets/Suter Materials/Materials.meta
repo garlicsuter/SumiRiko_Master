@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Suter Materials/Materials.meta
 guid: 99651ffeaa21ff142b4842da127f8be3
+========
+guid: 07ba181af16310044b7a2f6fc413f4d0
+>>>>>>>> Adam:Assets/Adam/Prefabs.meta
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}
