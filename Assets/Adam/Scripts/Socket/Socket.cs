@@ -170,7 +170,7 @@ public class Socket : MonoBehaviour
     /// <summary>
     /// Does the user have this object in their hand?
     /// </summary>
-    private bool IsGrabbed(GameObject obj)
+    public bool IsGrabbed(GameObject obj)
     {
         if(rightController.hasSelection)
         {
