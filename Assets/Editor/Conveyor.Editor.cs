@@ -14,6 +14,7 @@ public class ConveyorEditor : Editor
         EditorGUI.BeginChangeCheck();
 
         // Inspector values
+        EditorGUILayout.PropertyField(serializedObject.FindProperty("clone"));
         EditorGUILayout.PropertyField(serializedObject.FindProperty("nodes"));
         c_target.amount = EditorGUILayout.IntField("Amount", c_target.amount);
 
