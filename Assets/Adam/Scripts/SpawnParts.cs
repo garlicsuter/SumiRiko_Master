@@ -1,16 +1,26 @@
 using System.Collections;
 using UnityEngine;
 
-/// <summary>
-/// SHOWCASE CODE
-/// </summary>
 public class SpawnParts : MonoBehaviour
 {
-    public GameObject partPrefab;
+    public GameObject prefab;
     public Vector3 position;
 
-    public void Spawn()
+    private GameObject clone;
+
+    private void Start() => StartCoroutine(Spawn());
+    private void OnTriggerExit(Collider other)
     {
-        Instantiate(partPrefab, position, transform.rotation);
+        if (other.gameObject == clone)
+        {
+            StartCoroutine(Spawn());
+        }
+    }
+
+    public IEnumerator Spawn()
+    {
+        yield return new WaitForSecondsRealtime(1.0f);
+
+        clone = Instantiate(prefab, position, transform.rotation);
     }
 }

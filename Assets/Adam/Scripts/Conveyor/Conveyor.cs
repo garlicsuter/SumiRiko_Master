@@ -15,8 +15,6 @@ public class Conveyor : MonoBehaviour
 
     private float increment;
 
-    private SpawnParts[] partSpawner;
-
     private void Start()
     {
         InitNodes();
@@ -25,33 +23,16 @@ public class Conveyor : MonoBehaviour
             Debug.LogError("Provide a reference gameobject in the conveyor script. Inspector -> Debug Mode");
         }
 
-        partSpawner = GameObject.Find("SpawnParts").GetComponents<SpawnParts>();
-
         StartCoroutine("Move");
     }
-    private IEnumerator Move()
+    private void Update()
     {
-        foreach (var comp in partSpawner)
-        {
-            comp.Spawn();
-        }
-
-        yield return new WaitForSecondsRealtime(5f);
-
-        StartCoroutine("Move");
-
         // Iterate through each point to update transform
         for (int i = 0; i < points.Length; i++)
         {
             // Helper
             Point point = points[i];
             Node node = nodes[point.node];
-
-            // Increment offset
-            points[i].offset += increment;
-
-            // Calculate position
-            points[i].transform.position = (node.forward * point.offset) + node.position;
 
             // Modify current node
             if (point.offset > node.length)
@@ -77,9 +58,32 @@ public class Conveyor : MonoBehaviour
                 points[i].transform.forward = node.forward;
                 points[i].transform.rotation = node.rotation;
             }
+
+            // Calculate position
+            points[i].transform.position = Vector3.Lerp(point.transform.position, point.wishPosition, 0.01f);
         }
     }
 
+    private IEnumerator Move()
+    {
+        yield return new WaitForSecondsRealtime(5f);
+
+        StartCoroutine("Move");
+
+        // Iterate through each point to update transform
+        for (int i = 0; i < points.Length; i++)
+        {
+            // Helper
+            Point point = points[i];
+            Node node = nodes[point.node];
+
+            // Increment offset
+            points[i].offset += increment;
+
+            // Calculate position
+            points[i].wishPosition = (node.forward * point.offset) + node.position;
+        }
+    }
     public void InitNodes()
     {
         // Runtime edits
@@ -158,6 +162,7 @@ public class Conveyor : MonoBehaviour
                 point.gameObject = Instantiate(clone, transform);
                 point.gameObject.SetActive(true); // GameObjects spawned disabled?
                 point.transform.position = (node.forward * offset) + node.position;
+                point.wishPosition = point.transform.position;
                 point.transform.forward = node.forward;
                 point.transform.rotation = node.rotation;
             }
@@ -190,6 +195,8 @@ public struct Point
 {
     public GameObject gameObject;
     public Transform transform => gameObject.transform;
+
+    public Vector3 wishPosition;
 
     public float offset;
     public int node;
