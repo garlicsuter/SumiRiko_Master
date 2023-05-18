@@ -1038,8 +1038,9 @@ MonoBehaviour:
     rotation: {x: 0, y: 0, z: 0, w: 0}
     length: 0
     isEnd: 0
-  amount: 0
   clone: {fileID: 0}
+  amount: 0
+  speed: 1
 --- !u!1 &657856481
 GameObject:
   m_ObjectHideFlags: 0
@@ -3287,8 +3288,9 @@ MonoBehaviour:
     rotation: {x: 0, y: -0.64806217, z: -0, w: 0.7615875}
     length: 1.9330939
     isEnd: 1
-  amount: 50
   clone: {fileID: 4563262600362309666, guid: 7f5ffd041e07caf4fa27ccc00a4e7984, type: 3}
+  amount: 50
+  speed: 1
 --- !u!1 &1994333162
 GameObject:
   m_ObjectHideFlags: 0

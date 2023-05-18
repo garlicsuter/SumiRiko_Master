@@ -1,80 +1,88 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+
+//
+// Written by Adam Calvelage -> adamjasoncalvelage@gmail.com
+//
 
 public class Conveyor : MonoBehaviour
 {
     public Node[] nodes;
     private Point[] points;
-    private float beltLength;
 
-    public int amount;
     public GameObject clone;
+    public int amount;
 
+    private float beltLength;
     private float increment;
 
     private void Start()
     {
         InitNodes();
-
-        float speed = 2f;
+        float speed = 3.0f;
         InvokeRepeating("Move", speed, speed);
     }
     private void Update()
     {
-        for (int i = 0; i < points.Length; i++)
+        for(int i = 0; i < points.Length; i++)
         {
             Point point = points[i];
             Node node = nodes[point.node];
 
-            if (point.offset > node.length)
-            {;
-                int next = points[i].node + 1;
+            if(point.offset > node.length)
+            {
+                point.offset -= node.length;
+
+                int next = point.node + 1;
                 bool end = nodes[next].isEnd;
-
-                points[i].offset -= node.length;
-
-                if (end && point.transform.childCount != 0)
-                {
-                    Destroy(point.transform.GetChild(0).gameObject);
-                }
 
                 next = end ? 0 : next;
                 node = nodes[next];
 
-                points[i].node = next;
+                point.node = next;
 
-                // ...
-                points[i].transform.forward = node.forward;
-                points[i].transform.rotation = node.rotation;
+                point.wishPosition = (node.forward * point.offset) + node.position;
+
+                point.transform.forward = node.forward;
+                point.transform.rotation = node.rotation;
+
+                if(end)
+                {
+                    point.transform.position = node.position;
+                    point.wishPosition = node.position;
+                }
+
+                if(point.transform.childCount > 0)
+                {
+                    Destroy(point.transform.GetChild(0).gameObject);
+                }
             }
 
-            points[i].transform.position = Vector3.Lerp(point.transform.position, point.wishPosition, 0.01f);
+            point.transform.position = Vector3.Lerp(point.transform.position, point.wishPosition, 0.005f);
         }
     }
 
     private void Move()
     {
         // Iterate through each point and update transform
-        for (int i = 0; i < points.Length; i++)
+        for(int i = 0; i < points.Length; i++)
         {
             Point point = points[i];
             Node node = nodes[point.node];
 
-
-            points[i].wishPosition = (node.forward * point.offset) + node.position;
-            points[i].offset += increment;
+            point.offset += increment;
+            point.wishPosition = (node.forward * point.offset) + node.position;
         }
     }
     public void InitNodes()
     {
         // Handle runtime edits
-        if (Application.isPlaying)
+        if(Application.isPlaying)
         {
             // Destroy the children
-            for (int i = 0; i < transform.childCount; i++)
+            for(int i = 0; i < transform.childCount; i++)
             {
                 Destroy(transform.GetChild(i).gameObject);
             }
@@ -84,10 +92,10 @@ public class Conveyor : MonoBehaviour
         }
 
         // ...
-        for (int i = 0; i < nodes.Length; i++)
+        for(int i = 0; i < nodes.Length; i++)
         {
             // Mark endpoint
-            if (i + 1 >= nodes.Length)
+            if(i + 1 >= nodes.Length)
             {
                 nodes[i].isEnd = true;
                 break;
@@ -119,14 +127,14 @@ public class Conveyor : MonoBehaviour
         float offset = 0.0f;
 
         // Generate evenly spaced points
-        for (int count = 1; count <= amount; count++)
+        for(int count = 1; count <= amount; count++)
         {
             // ...
             var current = nodes[index];
             var next = nodes[index + 1];
 
             // Try to switch to the next node
-            if (offset > current.length)
+            if(offset > current.length)
             {
                 // ...
                 offset -= current.length;
@@ -136,7 +144,7 @@ public class Conveyor : MonoBehaviour
 
             // ...
             var point = new Point();
-            if (Application.isPlaying)
+            if(Application.isPlaying)
             {
                 point.gameObject = Instantiate(clone, transform);
                 point.gameObject.SetActive(true); // They start disabled
@@ -160,7 +168,7 @@ public class Conveyor : MonoBehaviour
 }
 
 [Serializable]
-public struct Node
+public class Node
 {
     public Vector3 position;
     public Vector3 forward;
@@ -171,7 +179,7 @@ public struct Node
 }
 
 [Serializable]
-public struct Point
+public class Point
 {
     public GameObject gameObject;
     public Transform transform => gameObject.transform;

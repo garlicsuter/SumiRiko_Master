@@ -15,8 +15,7 @@ public class ConveyorEditor : Editor
 
         // Inspector values
         EditorGUILayout.PropertyField(serializedObject.FindProperty("clone"));
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("nodes"));
-        c_target.amount = EditorGUILayout.IntField("Amount", c_target.amount);
+        EditorGUILayout.PropertyField(serializedObject.FindProperty("amount"));
 
         // Will at least one node into existance
         if(c_target.nodes.Length == 0)
