@@ -47,4 +47,4 @@ MonoBehaviour:
   angles: {x: 45, y: 45, z: 35}
   size: 0.1
   speedRatio: 0.25
-  material: {fileID: 2100000, guid: f3f01728fd58ff34d82e4981ea93b0b3, type: 2}
+  material: {fileID: 2100000, guid: 653f2bdeb595bb64ead92bdb0052162d, type: 2}

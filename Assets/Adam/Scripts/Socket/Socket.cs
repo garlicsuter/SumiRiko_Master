@@ -53,12 +53,12 @@ public class Socket : MonoBehaviour
             if(!IsGrabbed(child.gameObject))
             {
                 // Lerp position to the center of the socket
-                float distance = Vector3.Distance(child.transform.position, transform.position);
+                //float distance = Vector3.Distance(child.transform.position, transform.position);
                 //child.transform.position = distance <= 0.001f ? transform.position : Vector3.Lerp(child.transform.position, transform.position, speed * Time.deltaTime);
                 child.transform.position = transform.position;
 
                 // Lerp rotation to the forward direction of the socket
-                float angle = Quaternion.Angle(child.transform.rotation, transform.rotation);
+                //float angle = Quaternion.Angle(child.transform.rotation, transform.rotation);
                 //child.transform.rotation = angle <= 0.5f ? transform.rotation : Quaternion.Lerp(child.transform.rotation, transform.rotation, speed * Time.deltaTime);
                 child.transform.rotation = transform.rotation;
             }
@@ -83,17 +83,29 @@ public class Socket : MonoBehaviour
             // Setup a clone of the held object
             if(clone.gameObject == null)
             {
-                // Create object and components
-                clone.gameObject = new GameObject("Clone");
-                clone.filter = clone.gameObject.AddComponent<MeshFilter>();
-                clone.renderer = clone.gameObject.AddComponent<MeshRenderer>();
+                //// Create object and components
+                //clone.gameObject = new GameObject("Clone");
+                //clone.filter = clone.gameObject.AddComponent<MeshFilter>();
+                //clone.renderer = clone.gameObject.AddComponent<MeshRenderer>();
 
-                // Copy values to the cloned object
-                clone.filter.mesh = heldObject.GetComponent<MeshFilter>().sharedMesh;
+                //// Copy values to the cloned object
+                //clone.filter.mesh = heldObject.GetComponent<MeshFilter>().mesh;
+                //clone.renderer.material = material;
+                //clone.transform.SetParent(transform);
+                //clone.transform.SetPositionAndRotation(transform.position, transform.rotation);
+                //clone.transform.localScale = heldObject.transform.localScale;
+
+                clone.gameObject = Instantiate(heldObject, transform);
+                clone.filter = clone.gameObject.GetComponent<MeshFilter>();
+                clone.renderer = clone.gameObject.GetComponent<MeshRenderer>();
                 clone.renderer.material = material;
-                clone.transform.SetParent(transform);
-                clone.transform.SetPositionAndRotation(transform.position, transform.rotation);
-                clone.transform.localScale = heldObject.transform.localScale;
+
+                clone.transform.localPosition = Vector3.zero;
+                clone.transform.localRotation = Quaternion.identity;
+
+                Destroy(clone.gameObject.GetComponent<XRGrabInteractable>());
+                Destroy(clone.gameObject.GetComponent<Rigidbody>());
+                Destroy(clone.gameObject.GetComponent<BoxCollider>());
             }
 
             // Check for a valid orientation

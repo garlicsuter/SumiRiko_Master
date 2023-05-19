@@ -21,7 +21,7 @@ public class Conveyor : MonoBehaviour
     private void Start()
     {
         InitNodes();
-        float speed = 3.0f;
+        float speed = 5.0f;
         InvokeRepeating("Move", speed, speed);
     }
     private void Update()
